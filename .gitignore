@@ -1,0 +1,49 @@
+# --- 1. AMBIENTES VIRTUAIS ---
+venv/
+.venv/
+env/
+virtualenv/
+
+# --- 2. CREDENCIAIS E SEGURANÇA (CRÍTICO) ---
+.env
+*.env
+.flaskenv
+secrets.json
+
+# --- 3. BANCO DE DADOS LOCAL ---
+*.db
+*.sqlite3
+*.sqlite
+/data/  # Caso você tenha uma pasta de volumes de dados
+
+# --- 4. PYTHON CACHE E COMPILADOS ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# --- 5. DEPENDÊNCIAS DE FRONTEND (REACT/VITE) ---
+node_modules/
+dist/
+build/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- 6. CELERY & REDIS ---
+celerybeat-schedule
+celerybeat.pid
+
+
+# --- 7. FERRAMENTAS DE DESENVOLVIMENTO (IDE) ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- 8. DOCKER ---
+.docker/

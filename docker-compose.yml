@@ -1,0 +1,66 @@
+services:
+ ## 1. Redis: Broker interlocutor do sistema, funcionando
+ ## como fila de pedidos para o Celery, armazenando as 
+ ## tarefas (tasks) a serem enviadas ao worker.
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+ ## 2. BACKEND: API (FastAPI) principal, que faz a ligação
+ ## com frontend.
+  backend:
+    build: ./backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - TIMEZONE=America/Sao_Paulo
+
+ ## 3. WORKER: Executa as tarefas, rodando, através da lógica do ETA
+ ## além do envio de email de forma assíncrona
+ ## --pool=solo para estabilizar os ambientes Windows/Docker. 
+  worker:
+    build: ./backend
+    command: celery -A celery_instance.celery_app worker --loglevel=info --pool=solo
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - TIMEZONE=America/Sao_Paulo
+
+ ## 4. BEAT: Cronômetro agendador de tarefas, que faz o worker 
+ ## busque informações de ônibus, minuto a minuto, fazendo 
+ ## o tratamento.
+  beat:
+    build: ./backend
+    command: celery -A celery_instance.celery_app beat --loglevel=info
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - redis
+    environment:
+        - REDIS_URL=redis://redis:6379/0
+        - CELERY_BROKER_URL=redis://redis:6379/0
+        - TIMEZONE=America/Sao_Paulo
+
+ ## 5. FRONTEND: Interface visual em React+Vite, permitindo
+ ## conexões dentro e fora do container.
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    working_dir: /app
+
+    command:  npm run dev -- --host 0.0.0.0
