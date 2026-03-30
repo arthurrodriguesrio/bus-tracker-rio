@@ -117,6 +117,7 @@ BUS-TRACKER/
 │   │   │   └── api.js
 │   │   └── App.jsx         # Componente principal React
 │   └── Dockerfile          # Containerização do Frontend
+├── screenshots             # Prints .png
 ├── docker-compose.yml      # Orquestração full stack (Redis, App, Web)
 └── README.md
 
